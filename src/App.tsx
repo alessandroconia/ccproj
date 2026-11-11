@@ -1,14 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { loadCatalog, type Catalog } from "./catalog";
+import { loadCatalog, type Catalog, type Item } from "./catalog";
+import { LEGAL_LINKS, LegalPage, useLegalRoute } from "./Legal";
 
 // Placeholder until the real PayPal URL is set via the VITE_CHECKOUT_URL repository variable.
 // The /it/ path keeps PayPal on the Italian site instead of guessing a region from browser headers.
 const CHECKOUT_URL = import.meta.env.VITE_CHECKOUT_URL?.startsWith("https://")
   ? import.meta.env.VITE_CHECKOUT_URL
   : "https://www.paypal.com/it/home";
-
-const FREE_SHIPPING_CENTS = 6000;
-const SHIPPING_CENTS = 600;
 
 const euro = new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" });
 const formatMoney = (cents: number) => euro.format(cents / 100);
@@ -96,6 +94,7 @@ function ImagePlaceholder({
 }
 
 export default function App() {
+  const legalRoute = useLegalRoute();
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [categoryId, setCategoryId] = useState("all");
@@ -125,19 +124,24 @@ export default function App() {
   const visibleProducts =
     categoryId === "all" ? products : products.filter((product) => product.categoryId === categoryId);
 
-  const selectedProducts = products.filter((product) => quantities[product.id] > 0);
-  const itemCount = Object.values(quantities).reduce((sum, quantity) => sum + quantity, 0);
-  const subtotal = products.reduce(
-    (sum, product) => sum + product.priceCents * (quantities[product.id] || 0),
+  // Never trust the stored quantity beyond what is in stock.
+  const quantityOf = (product: Item) =>
+    Math.min(quantities[product.id] || 0, product.availableQuantity);
+
+  const selectedProducts = products.filter((product) => quantityOf(product) > 0);
+  const itemCount = products.reduce((sum, product) => sum + quantityOf(product), 0);
+  const total = products.reduce(
+    (sum, product) => sum + product.priceCents * quantityOf(product),
     0,
   );
-  const shipping = subtotal >= FREE_SHIPPING_CENTS || subtotal === 0 ? 0 : SHIPPING_CENTS;
-  const total = subtotal + shipping;
 
-  const updateQuantity = (id: string, delta: number) => {
+  const updateQuantity = (product: Item, delta: number) => {
     setQuantities((current) => ({
       ...current,
-      [id]: Math.max(0, Math.min(9, (current[id] || 0) + delta)),
+      [product.id]: Math.max(
+        0,
+        Math.min(product.availableQuantity, (current[product.id] || 0) + delta),
+      ),
     }));
   };
 
@@ -183,6 +187,9 @@ export default function App() {
         </button>
       </header>
 
+      {legalRoute ? (
+        <LegalPage route={legalRoute} />
+      ) : (
       <main id="shop">
         <section className="intro">
           <p className="eyebrow">Catalogo</p>
@@ -220,18 +227,23 @@ export default function App() {
               <p className="grid-message">Nessun articolo in questa categoria.</p>
             )}
             {visibleProducts.map((product) => {
-              const quantity = quantities[product.id] || 0;
+              const quantity = quantityOf(product);
+              const soldOut = product.availableQuantity === 0;
               return (
                 <article
-                  className={`product-card ${quantity ? "is-selected" : ""}`}
+                  className={`product-card ${quantity ? "is-selected" : ""} ${soldOut ? "is-sold-out" : ""}`}
                   key={product.id}
                 >
                   <div className="product-visual">
-                    {quantity > 0 && (
-                      <span className="selected-badge">
-                        <Icon name="check" size={14} strokeWidth={2.5} />
-                        Aggiunto
-                      </span>
+                    {soldOut ? (
+                      <span className="selected-badge sold-out-badge">Esaurito</span>
+                    ) : (
+                      quantity > 0 && (
+                        <span className="selected-badge">
+                          <Icon name="check" size={14} strokeWidth={2.5} />
+                          Aggiunto
+                        </span>
+                      )
                     )}
                     <ImagePlaceholder src={product.imageUrl} alt={product.name} />
                   </div>
@@ -245,12 +257,14 @@ export default function App() {
                     <p className="price">{formatMoney(product.priceCents)}</p>
                   </div>
                   <div className="quantity-row">
-                    <span>Quantità</span>
+                    <span>
+                      {soldOut ? "Non disponibile" : `Disponibili: ${product.availableQuantity}`}
+                    </span>
                     <div className="stepper" aria-label={`Quantità per ${product.name}`}>
                       <button
                         aria-label={`Diminuisci la quantità di ${product.name}`}
                         disabled={quantity === 0}
-                        onClick={() => updateQuantity(product.id, -1)}
+                        onClick={() => updateQuantity(product, -1)}
                         type="button"
                       >
                         <Icon name="minus" size={17} />
@@ -258,7 +272,8 @@ export default function App() {
                       <span aria-live="polite">{quantity}</span>
                       <button
                         aria-label={`Aumenta la quantità di ${product.name}`}
-                        onClick={() => updateQuantity(product.id, 1)}
+                        disabled={quantity >= product.availableQuantity}
+                        onClick={() => updateQuantity(product, 1)}
                         type="button"
                       >
                         <Icon name="plus" size={17} />
@@ -288,9 +303,9 @@ export default function App() {
                     <ImagePlaceholder src={product.imageUrl} alt={product.name} size="thumb" />
                     <div>
                       <h3>{product.name}</h3>
-                      <p>Qtà {quantities[product.id]}</p>
+                      <p>Qtà {quantityOf(product)}</p>
                     </div>
-                    <strong>{formatMoney(product.priceCents * quantities[product.id])}</strong>
+                    <strong>{formatMoney(product.priceCents * quantityOf(product))}</strong>
                   </div>
                 ))
               ) : (
@@ -301,23 +316,6 @@ export default function App() {
                   <p>Il tuo carrello è vuoto.</p>
                   <small>Aggiungi un articolo per iniziare.</small>
                 </div>
-              )}
-            </div>
-
-            <div className="totals">
-              <div>
-                <span>Subtotale</span>
-                <span>{formatMoney(subtotal)}</span>
-              </div>
-              <div>
-                <span>Spedizione</span>
-                <span>{shipping ? formatMoney(shipping) : "Gratuita"}</span>
-              </div>
-              {subtotal > 0 && subtotal < FREE_SHIPPING_CENTS && (
-                <p>
-                  Aggiungi ancora {formatMoney(FREE_SHIPPING_CENTS - subtotal)} per la spedizione
-                  gratuita.
-                </p>
               )}
             </div>
 
@@ -348,11 +346,18 @@ export default function App() {
           </aside>
         </div>
       </main>
+      )}
 
       <footer>
         <div className="footer-inner">
           <p>catalog.</p>
-          <span>Spedizione gratuita per ordini superiori a {formatMoney(FREE_SHIPPING_CENTS)}</span>
+          <nav aria-label="Informazioni legali" className="footer-links">
+            {LEGAL_LINKS.map((link) => (
+              <a key={link.route} href={`#/${link.route}`}>
+                {link.label}
+              </a>
+            ))}
+          </nav>
         </div>
       </footer>
     </div>

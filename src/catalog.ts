@@ -11,6 +11,8 @@ export type Item = {
   priceCents: number;
   imageUrl: string | null;
   description: string | null;
+  /** Units that can be bought. 0 (or missing/invalid data) means sold out. */
+  availableQuantity: number;
 };
 
 export type Catalog = {
@@ -27,6 +29,7 @@ type ItemRow = {
   price_cents: number;
   image_path?: string | null;
   description?: string | null;
+  available_quantity?: number | null;
   active?: boolean | null;
   sort_order?: number | null;
 };
@@ -47,6 +50,11 @@ function imageUrlFor(path: string | null | undefined): string | null {
   return `${SUPABASE_URL}/storage/v1/object/public/${IMAGE_BUCKET}/${encoded}`;
 }
 
+// Fail closed: anything that is not a finite number counts as sold out.
+function toStock(value: number | null | undefined): number {
+  return typeof value === "number" && Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+}
+
 function toCatalog({ categories, items }: CatalogRows): Catalog {
   return {
     categories: categories
@@ -61,6 +69,7 @@ function toCatalog({ categories, items }: CatalogRows): Catalog {
         priceCents: row.price_cents,
         imageUrl: imageUrlFor(row.image_path),
         description: row.description ?? null,
+        availableQuantity: toStock(row.available_quantity),
         sortOrder: row.sort_order ?? 0,
       }))
       .sort(bySortOrder)

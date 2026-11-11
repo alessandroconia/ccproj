@@ -15,8 +15,8 @@ function contentSecurityPolicy(supabaseUrl: string | undefined): Plugin {
   const policy = [
     "default-src 'self'",
     "script-src 'self'",
-    "style-src 'self' https://fonts.googleapis.com",
-    "font-src https://fonts.gstatic.com",
+    "style-src 'self'",
+    "font-src 'self' data:",
     `img-src 'self' data:${origin ? ` ${origin}` : ""}`,
     `connect-src 'self'${origin ? ` ${origin}` : ""}`,
     "object-src 'none'",

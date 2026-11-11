@@ -10,15 +10,25 @@ create table if not exists public.categories (
 );
 
 create table if not exists public.items (
-  id          text primary key,
-  name        text not null,
-  category_id text not null references public.categories (id) on update cascade on delete restrict,
-  price_cents integer not null check (price_cents >= 0),
-  image_path  text,
-  description text,
-  active      boolean not null default true,
-  sort_order  integer not null default 0
+  id                 text primary key,
+  name               text not null,
+  category_id        text not null references public.categories (id) on update cascade on delete restrict,
+  price_cents        integer not null check (price_cents >= 0),
+  image_path         text,
+  description        text,
+  available_quantity integer not null default 0 check (available_quantity >= 0),
+  active             boolean not null default true,
+  sort_order         integer not null default 0
 );
+
+-- Upgrade path for databases created before stock tracking existed.
+-- New rows default to 0 (sold out); edit the value in the Table Editor to put stock on sale.
+alter table public.items
+  add column if not exists available_quantity integer not null default 0;
+alter table public.items
+  drop constraint if exists items_available_quantity_check;
+alter table public.items
+  add constraint items_available_quantity_check check (available_quantity >= 0);
 
 create index if not exists items_category_id_idx on public.items (category_id);
 

@@ -28,6 +28,8 @@ All values are read at build time and end up in the public bundle. Only put publ
 
 Without the Supabase values the app loads `public/data/items.json`. It also uses that file if Supabase can't be reached.
 
+Fonts are self-hosted (`@fontsource-variable`), so visitors' browsers contact no third party except Supabase (catalog) and, at checkout, PayPal.
+
 Never use the `service_role` / secret key or the database connection string in any `VITE_` variable, in GitHub Variables, or in the code.
 
 ## Supabase setup
@@ -40,7 +42,8 @@ The schema enables Row Level Security with read-only policies and revokes write 
 
 ### Adding items and images
 
-- Edit the `items` and `categories` tables in the Supabase Table Editor. Prices are integer cents (`2400` = $24.00). Set `active` to false to hide an item.
+- Edit the `items` and `categories` tables in the Supabase Table Editor. Prices are integer euro cents (`2400` = 24,00 €). Set `active` to false to hide an item.
+- **Stock:** `available_quantity` is the maximum a visitor can add to the bag. It defaults to `0` (sold out) for every item, so set the real stock in the Table Editor. Re-running `seed.sql` never overwrites it. There is no shipping fee.
 - Upload an image to the public `item-images` bucket, then set the item's `image_path` to the file name (for example `item-01.jpg`). A full `https://` URL also works. With no path, a placeholder is shown.
 - Keep `public/data/items.json` in sync if you want the fallback to match.
 
@@ -51,13 +54,19 @@ The schema enables Row Level Security with read-only policies and revokes write 
 1. Repo Settings, Pages, Source: **GitHub Actions**.
 2. Repo Settings, Secrets and variables, Actions, **Variables** tab: add `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` and, when ready, `VITE_CHECKOUT_URL` as repository variables.
 
-The site is served under `/ccproj/` (`base` in `vite.config.ts`). Production builds include a Content-Security-Policy meta tag that only allows the site itself, the Supabase origin and Google Fonts.
+The site is served under `/ccproj/` (`base` in `vite.config.ts`). Production builds include a Content-Security-Policy meta tag that only allows the site itself and the Supabase origin.
 
 ## Search engines
 
 The site is currently hidden from search engines. To make it indexable, delete `public/robots.txt` (or change `Disallow: /` to `Allow: /`) and remove the `<meta name="robots" ...>` tag in `index.html`.
 
+## Legal pages
+
+The footer links to three draft pages (`#/note-legali`, `#/privacy`, `#/termini`) defined in [`src/Legal.tsx`](src/Legal.tsx). They contain only headings and `[DA COMPILARE]` placeholders. Fill them in (ideally with a lawyer or consultant) before taking real payments.
+
 ## Security notes
+
+- **Stock is not enforced at payment.** `available_quantity` only limits what the page lets a visitor add. A PayPal link does not check or reduce stock, and the page does not refresh stock while it is open, so two buyers can still pay for the last unit. Real stock control needs a server-side step (for example a Supabase Edge Function with PayPal webhooks).
 
 - The publishable key is visible to anyone who opens the site. That is expected and safe only because of the read-only Row Level Security policies.
 - Prices come from the browser. The payment link does not verify cart totals, so real payment handling needs a server-side step.

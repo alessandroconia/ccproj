@@ -1,4 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600&display=swap");
+@import "@fontsource-variable/dm-sans/wght.css";
+@import "@fontsource-variable/manrope/wght.css";
 @import "tailwindcss";
 
 :root {
@@ -18,7 +19,7 @@
 
   color: var(--ink);
   background: var(--ivory);
-  font-family: "DM Sans", sans-serif;
+  font-family: "DM Sans Variable", sans-serif;
   font-synthesis: none;
 }
 
@@ -68,7 +69,7 @@ html {
   align-items: center;
   gap: 10px;
   color: var(--ink);
-  font-family: "Manrope", sans-serif;
+  font-family: "Manrope Variable", sans-serif;
   font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.7px;
@@ -178,7 +179,7 @@ main {
 .intro h1 {
   max-width: 660px;
   color: var(--ink);
-  font-family: "Manrope", sans-serif;
+  font-family: "Manrope Variable", sans-serif;
   font-size: clamp(42px, 4.7vw, 66px);
   font-weight: 400;
   line-height: 1.06;
@@ -368,7 +369,7 @@ main {
 
 .product-info h2 {
   color: var(--ink);
-  font-family: "Manrope", sans-serif;
+  font-family: "Manrope Variable", sans-serif;
   font-size: 15px;
   font-weight: 600;
   line-height: 1.4;
@@ -420,6 +421,15 @@ main {
   color: var(--crimson);
 }
 
+.product-card.is-sold-out .product-visual,
+.product-card.is-sold-out .product-info {
+  opacity: 0.55;
+}
+
+.sold-out-badge {
+  color: var(--ink);
+}
+
 .stepper button:disabled {
   color: #c9c7c1;
   cursor: default;
@@ -456,7 +466,7 @@ main {
 }
 
 .summary-heading h2 {
-  font-family: "Manrope", sans-serif;
+  font-family: "Manrope Variable", sans-serif;
   font-size: 23px;
   font-weight: 500;
   letter-spacing: -0.8px;
@@ -529,34 +539,6 @@ main {
   font-size: 10px;
 }
 
-.totals {
-  padding: 17px 0 14px;
-  border-bottom: 1px solid var(--line);
-}
-
-.totals div {
-  display: flex;
-  justify-content: space-between;
-  margin: 7px 0;
-  color: var(--muted);
-  font-size: 11px;
-}
-
-.totals div span:last-child {
-  color: var(--ink);
-  font-weight: 600;
-}
-
-.totals p {
-  margin-top: 9px;
-  padding: 7px 9px;
-  border-radius: 2px;
-  color: var(--crimson-dark);
-  background: var(--blush);
-  font-size: 9px;
-  text-align: center;
-}
-
 .grand-total {
   display: flex;
   align-items: flex-end;
@@ -583,7 +565,7 @@ main {
 
 .grand-total strong {
   color: var(--ink);
-  font-family: "Manrope", sans-serif;
+  font-family: "Manrope Variable", sans-serif;
   font-size: 24px;
   font-weight: 600;
   letter-spacing: -1px;
@@ -660,7 +642,7 @@ footer {
 
 footer p {
   color: #fff;
-  font-family: "Manrope", sans-serif;
+  font-family: "Manrope Variable", sans-serif;
   font-size: 14px;
 }
 
@@ -718,4 +700,59 @@ footer p {
     justify-content: center;
     gap: 7px;
   }
+}
+
+/* Legal pages and footer links */
+.footer-links {
+  gap: 24px;
+}
+
+.footer-links a {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.legal {
+  flex: 1;
+  max-width: 760px;
+  padding: 48px 0 90px;
+}
+
+.legal-back {
+  color: var(--muted);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.legal h1 {
+  margin: 24px 0 16px;
+  font-family: "Manrope Variable", sans-serif;
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: -1.5px;
+}
+
+.legal h2 {
+  margin: 28px 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.legal section p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.legal-draft {
+  padding: 10px 14px;
+  border-radius: 2px;
+  color: var(--crimson-dark);
+  background: var(--blush);
+  font-size: 13px;
 }
