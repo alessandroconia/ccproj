@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { loadCatalog, type Catalog, type Item } from "./catalog";
-import { LEGAL_LINKS, LegalPage, useLegalRoute } from "./Legal";
+import { INFO_ROUTE, InfoPage, LEGAL_LINKS, LegalPage, useLegalRoute } from "./Legal";
+
+// Moment the page was loaded; a reload is the sync, so this is the "last synced" time.
+const LOADED_AT = new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
 
 // Placeholder until the real PayPal URL is set via the VITE_CHECKOUT_URL repository variable.
 // The /it/ path keeps PayPal on the Italian site instead of guessing a region from browser headers.
@@ -157,19 +160,22 @@ export default function App() {
   return (
     <div className="app-shell">
       <header className="site-header">
-        <a className="brand" href="#" aria-label="Catalog, pagina iniziale">
+        <a className="brand" href="#" aria-label="ccproj, pagina iniziale">
           <span className="brand-mark">
             <span />
             <span />
             <span />
           </span>
-          <span>catalog.</span>
+          <span>ccproj</span>
         </a>
         <nav aria-label="Navigazione principale">
-          <a className="nav-link active" href="#shop">
+          <a className={`nav-link ${legalRoute === INFO_ROUTE ? "" : "active"}`} href="#shop">
             Negozio
           </a>
-          <a className="nav-link" href="#about">
+          <a
+            className={`nav-link ${legalRoute === INFO_ROUTE ? "active" : ""}`}
+            href={`#/${INFO_ROUTE}`}
+          >
             Informazioni
           </a>
           <a className="nav-link" href="#support">
@@ -187,13 +193,21 @@ export default function App() {
         </button>
       </header>
 
-      {legalRoute ? (
+      {legalRoute === INFO_ROUTE ? (
+        <InfoPage />
+      ) : legalRoute ? (
         <LegalPage route={legalRoute} />
       ) : (
       <main id="shop">
+        <div className="sync">
+          <button className="sync-button" type="button" onClick={() => window.location.reload()}>
+            Synch
+          </button>
+          <span className="sync-time">Aggiornato alle {LOADED_AT}</span>
+        </div>
         <section className="intro">
           <p className="eyebrow">Catalogo</p>
-          <h1>Scegli ciò di cui hai bisogno.</h1>
+          <h1>Scegli cosa vorresti.</h1>
           <p className="intro-copy">
             Sfoglia gli articoli qui sotto, scegli le quantità e controlla la tua selezione prima
             di procedere al pagamento.
@@ -350,7 +364,7 @@ export default function App() {
 
       <footer>
         <div className="footer-inner">
-          <p>catalog.</p>
+          <p>ccproj catalog</p>
           <nav aria-label="Informazioni legali" className="footer-links">
             {LEGAL_LINKS.map((link) => (
               <a key={link.route} href={`#/${link.route}`}>

@@ -163,8 +163,37 @@ main {
   margin: 0 auto;
 }
 
+.sync {
+  padding-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+
+.sync-button {
+  padding: 7px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sync-button:hover {
+  border-color: var(--crimson);
+  color: var(--crimson);
+}
+
+.sync-time {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .intro {
-  padding: 65px 0 37px;
+  padding: 45px 0 37px;
 }
 
 .eyebrow {
@@ -746,6 +775,14 @@ footer p {
 .legal section p {
   color: var(--muted);
   font-size: 14px;
+  line-height: 1.7;
+}
+
+.info-text {
+  max-width: 560px;
+  color: var(--muted);
+  font-size: 18px;
+  font-style: italic;
   line-height: 1.7;
 }
 

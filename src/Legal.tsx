@@ -57,11 +57,13 @@ export const LEGAL_LINKS = [
 ];
 
 const ROUTE_PREFIX = "#/";
+export const INFO_ROUTE = "informazioni";
 
 function currentRoute(): string | null {
   const hash = window.location.hash;
   if (!hash.startsWith(ROUTE_PREFIX)) return null;
   const route = hash.slice(ROUTE_PREFIX.length);
+  if (route === INFO_ROUTE) return route;
   return Object.prototype.hasOwnProperty.call(PAGES, route) ? route : null;
 }
 
@@ -77,6 +79,21 @@ export function useLegalRoute(): string | null {
     return () => window.removeEventListener("hashchange", onChange);
   }, []);
   return route;
+}
+
+export function InfoPage() {
+  return (
+    <main className="legal">
+      <a className="legal-back" href="#shop">
+        ← Torna al negozio
+      </a>
+      <h1>Informazioni</h1>
+      <p className="info-text">
+        ccproj non è un e-commerce: è un progetto pensato per un piccolo gruppo di persone, per
+        facilitare in modo semplice e interattivo l'incontro tra domanda e offerta.
+      </p>
+    </main>
+  );
 }
 
 export function LegalPage({ route }: { route: string }) {
