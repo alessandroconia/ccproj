@@ -2,6 +2,8 @@
 
 A static catalog and checkout page, built with React, Vite and Tailwind and hosted on GitHub Pages. Items and categories come from Supabase, with a bundled JSON file as a fallback. Checkout opens an external payment link. A second tab, **Preordini**, lets the community fund an item in small steps.
 
+Uses github actions.
+
 Live site: https://alessandroconia.github.io/ccproj/
 
 ## Local development
