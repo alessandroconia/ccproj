@@ -178,9 +178,6 @@ export default function App() {
           >
             Informazioni
           </a>
-          <a className="nav-link" href="#support">
-            Assistenza
-          </a>
         </nav>
         <button
           className="bag-button"
