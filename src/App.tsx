@@ -1,108 +1,34 @@
 import { useEffect, useMemo, useState } from "react";
 import { loadCatalog, type Catalog, type Item } from "./catalog";
-import { INFO_ROUTE, InfoPage, LEGAL_LINKS, LegalPage, useLegalRoute } from "./Legal";
+import {
+  INFO_ROUTE,
+  InfoPage,
+  LEGAL_LINKS,
+  LegalPage,
+  PREORDINI_ROUTE,
+  useLegalRoute,
+} from "./Legal";
+import Preorders from "./PreordersPage";
+import { CHECKOUT_URL, formatMoney, Icon, ImagePlaceholder, SyncBar } from "./ui";
 
-// Moment the page was loaded; a reload is the sync, so this is the "last synced" time.
-const LOADED_AT = new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
-
-// Placeholder until the real PayPal URL is set via the VITE_CHECKOUT_URL repository variable.
-// The /it/ path keeps PayPal on the Italian site instead of guessing a region from browser headers.
-const CHECKOUT_URL = import.meta.env.VITE_CHECKOUT_URL?.startsWith("https://")
-  ? import.meta.env.VITE_CHECKOUT_URL
-  : "https://www.paypal.com/it/home";
-
-const euro = new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" });
-const formatMoney = (cents: number) => euro.format(cents / 100);
-
-function Icon({
-  name,
-  size = 20,
-  strokeWidth = 1.8,
-}: {
-  name: "bag" | "chevron" | "minus" | "plus" | "lock" | "arrow" | "check" | "image";
-  size?: number;
-  strokeWidth?: number;
-}) {
-  const paths = {
-    bag: (
-      <>
-        <path d="M6 8h12l1 12H5L6 8Z" />
-        <path d="M9 9V6a3 3 0 0 1 6 0v3" />
-      </>
-    ),
-    chevron: <path d="m8 10 4 4 4-4" />,
-    minus: <path d="M7 12h10" />,
-    plus: (
-      <>
-        <path d="M12 7v10" />
-        <path d="M7 12h10" />
-      </>
-    ),
-    lock: (
-      <>
-        <rect x="6" y="10" width="12" height="10" rx="2" />
-        <path d="M9 10V7a3 3 0 0 1 6 0v3" />
-      </>
-    ),
-    arrow: (
-      <>
-        <path d="M5 12h14" />
-        <path d="m14 7 5 5-5 5" />
-      </>
-    ),
-    check: <path d="m6 12 4 4 8-9" />,
-    image: (
-      <>
-        <rect x="3" y="5" width="18" height="14" rx="2" />
-        <circle cx="9" cy="10" r="1.5" />
-        <path d="m4 18 5-5 4 4 3-3 4 4" />
-      </>
-    ),
-  };
-
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      height={size}
-      viewBox="0 0 24 24"
-      width={size}
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={strokeWidth}
-    >
-      {paths[name]}
-    </svg>
-  );
-}
-
-function ImagePlaceholder({
-  src,
-  alt,
-  size = "card",
-}: {
-  src: string | null;
-  alt: string;
-  size?: "card" | "thumb";
-}) {
-  if (src) {
-    return <img className={`image-box image-box--${size}`} src={src} alt={alt} loading="lazy" />;
-  }
-  return (
-    <div className={`image-box image-box--${size} image-placeholder`} role="img" aria-label={alt}>
-      <Icon name="image" size={size === "card" ? 40 : 16} strokeWidth={1.4} />
-    </div>
-  );
-}
+// Main sections, shown in the header nav (desktop) and in the tab row (phones).
+const NAV_TABS = [
+  { key: "shop", label: "Negozio", href: "#shop" },
+  { key: PREORDINI_ROUTE, label: "Preordini", href: `#/${PREORDINI_ROUTE}` },
+  { key: INFO_ROUTE, label: "Informazioni", href: `#/${INFO_ROUTE}` },
+];
 
 export default function App() {
   const legalRoute = useLegalRoute();
+  // Legal pages keep Negozio highlighted, as before.
+  const activeTab = legalRoute === INFO_ROUTE || legalRoute === PREORDINI_ROUTE ? legalRoute : "shop";
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [categoryId, setCategoryId] = useState("all");
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [notice, setNotice] = useState("");
+  // Selected steps on the Preordini page (reported by <Preorders />).
+  const [stepCount, setStepCount] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -169,15 +95,15 @@ export default function App() {
           <span>ccproj</span>
         </a>
         <nav aria-label="Navigazione principale">
-          <a className={`nav-link ${legalRoute === INFO_ROUTE ? "" : "active"}`} href="#shop">
-            Negozio
-          </a>
-          <a
-            className={`nav-link ${legalRoute === INFO_ROUTE ? "active" : ""}`}
-            href={`#/${INFO_ROUTE}`}
-          >
-            Informazioni
-          </a>
+          {NAV_TABS.map((tab) => (
+            <a
+              className={`nav-link ${tab.key === activeTab ? "active" : ""}`}
+              href={tab.href}
+              key={tab.key}
+            >
+              {tab.label}
+            </a>
+          ))}
         </nav>
         <button
           className="bag-button"
@@ -186,22 +112,31 @@ export default function App() {
         >
           <Icon name="bag" size={19} />
           <span>Carrello</span>
-          <span className="bag-count">{itemCount}</span>
+          <span className="bag-count">{legalRoute === PREORDINI_ROUTE ? stepCount : itemCount}</span>
         </button>
       </header>
 
+      <nav className="tab-row" aria-label="Sezioni">
+        {NAV_TABS.map((tab) => (
+          <a
+            className={`tab-link ${tab.key === activeTab ? "active" : ""}`}
+            href={tab.href}
+            key={tab.key}
+          >
+            {tab.label}
+          </a>
+        ))}
+      </nav>
+
       {legalRoute === INFO_ROUTE ? (
         <InfoPage />
+      ) : legalRoute === PREORDINI_ROUTE ? (
+        <Preorders onSelectedCountChange={setStepCount} />
       ) : legalRoute ? (
         <LegalPage route={legalRoute} />
       ) : (
       <main id="shop">
-        <div className="sync">
-          <button className="sync-button" type="button" onClick={() => window.location.reload()}>
-            Synch
-          </button>
-          <span className="sync-time">Aggiornato alle {LOADED_AT}</span>
-        </div>
+        <SyncBar />
         <section className="intro">
           <p className="eyebrow">Catalogo</p>
           <h1>Scegli cosa vorresti.</h1>

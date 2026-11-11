@@ -58,16 +58,20 @@ export const LEGAL_LINKS = [
 
 const ROUTE_PREFIX = "#/";
 export const INFO_ROUTE = "informazioni";
+export const PREORDINI_ROUTE = "preordini";
+
+// Routes handled by their own page component (not by the generic legal pages).
+const APP_ROUTES = [INFO_ROUTE, PREORDINI_ROUTE];
 
 function currentRoute(): string | null {
   const hash = window.location.hash;
   if (!hash.startsWith(ROUTE_PREFIX)) return null;
   const route = hash.slice(ROUTE_PREFIX.length);
-  if (route === INFO_ROUTE) return route;
+  if (APP_ROUTES.includes(route)) return route;
   return Object.prototype.hasOwnProperty.call(PAGES, route) ? route : null;
 }
 
-/** Returns the active legal page route (or null for the shop), following hash changes. */
+/** Returns the active route (app page or legal page), or null for the shop, following hash changes. */
 export function useLegalRoute(): string | null {
   const [route, setRoute] = useState(currentRoute);
   useEffect(() => {

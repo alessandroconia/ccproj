@@ -1,0 +1,11 @@
+{
+  "preorder_items": [
+    { "id": "preorder-01", "name": "Articolo 01", "category_id": "category-a", "price_cents": 2400, "image_path": null, "description": null, "quantity": 0, "current_progress": 0, "required_progress": 4, "active": true, "sort_order": 1 },
+    { "id": "preorder-02", "name": "Articolo 02", "category_id": "category-a", "price_cents": 1600, "image_path": null, "description": null, "quantity": 0, "current_progress": 0, "required_progress": 6, "active": true, "sort_order": 2 },
+    { "id": "preorder-03", "name": "Articolo 03", "category_id": "category-b", "price_cents": 3200, "image_path": null, "description": null, "quantity": 0, "current_progress": 0, "required_progress": 2, "active": true, "sort_order": 3 },
+    { "id": "preorder-04", "name": "Articolo 04", "category_id": "category-b", "price_cents": 2800, "image_path": null, "description": null, "quantity": 0, "current_progress": 0, "required_progress": 5, "active": true, "sort_order": 4 },
+    { "id": "preorder-05", "name": "Articolo 05", "category_id": "category-c", "price_cents": 2000, "image_path": null, "description": null, "quantity": 0, "current_progress": 0, "required_progress": 3, "active": true, "sort_order": 5 },
+    { "id": "preorder-06", "name": "Articolo 06", "category_id": "category-c", "price_cents": 3600, "image_path": null, "description": null, "quantity": 0, "current_progress": 0, "required_progress": 6, "active": true, "sort_order": 6 }
+  ],
+  "bought_items": []
+}

@@ -136,6 +136,27 @@ nav {
   content: "";
 }
 
+/* Compact tab row: only shown on phones, where the header nav is hidden. */
+.tab-row {
+  display: none;
+}
+
+.tab-link {
+  flex: 1;
+  padding: 12px 4px 10px;
+  border-bottom: 2px solid transparent;
+  color: var(--nav);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+}
+
+.tab-link.active {
+  border-bottom-color: var(--crimson);
+  color: var(--ink);
+}
+
 .bag-button {
   justify-self: end;
   display: flex;
@@ -697,8 +718,16 @@ footer p {
     grid-template-columns: 1fr auto;
   }
 
-  nav {
+  nav:not(.tab-row) {
     display: none;
+  }
+
+  .tab-row {
+    width: min(100% - 32px, 1400px);
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--line);
   }
 
   .intro {
@@ -792,4 +821,158 @@ footer p {
   color: var(--crimson-dark);
   background: var(--blush);
   font-size: 13px;
+}
+
+/* Preordini page */
+.view-toggle {
+  display: flex;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.view-toggle button {
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  color: var(--muted);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.view-toggle button:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.view-toggle button.active {
+  color: #fff;
+  border-color: var(--charcoal);
+  background: var(--charcoal);
+}
+
+.preorder-info {
+  min-height: 99px;
+}
+
+.preorder-prices {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.step-price {
+  color: var(--crimson);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.full-price {
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: line-through;
+}
+
+.preorder-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px 16px;
+}
+
+.progress-bar {
+  position: relative;
+  flex: 1;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--line);
+}
+
+.progress-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--crimson);
+}
+
+.progress-pending {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  opacity: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--charcoal) 0 6px,
+    #9a9a96 6px 12px
+  );
+  background-size: 17px 17px;
+  animation: pending-stripes 0.8s linear infinite;
+  transition:
+    width 0.45s ease-in-out,
+    opacity 0.45s ease-in;
+}
+
+.progress-pending.is-active {
+  width: var(--step);
+  opacity: 1;
+  transition:
+    width 0.45s ease-out,
+    opacity 0.2s ease-out;
+}
+
+@keyframes pending-stripes {
+  to {
+    background-position: 17px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-pending {
+    animation: none;
+  }
+}
+
+.progress-text {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.product-card.is-sold-out .preorder-progress {
+  opacity: 0.55;
+}
+
+.confirmed-badge {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  right: 0;
+  padding: 8px 14px 8px 18px;
+  border-radius: 0 0 0 14px;
+  color: #3d2f00;
+  background: #f2c230;
+  box-shadow: 0 2px 10px rgba(28, 28, 28, 0.12);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 700px) {
+  .view-toggle button {
+    flex: 1;
+    padding: 8px 6px;
+  }
 }

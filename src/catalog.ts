@@ -42,7 +42,7 @@ const IMAGE_BUCKET = "item-images";
 const bySortOrder = (a: { sortOrder: number }, b: { sortOrder: number }) =>
   a.sortOrder - b.sortOrder;
 
-function imageUrlFor(path: string | null | undefined): string | null {
+export function imageUrlFor(path: string | null | undefined): string | null {
   if (!path) return null;
   if (/^https?:\/\//i.test(path)) return path;
   if (!SUPABASE_URL) return null;
@@ -77,7 +77,7 @@ function toCatalog({ categories, items }: CatalogRows): Catalog {
   };
 }
 
-async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
+export async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, init);
   if (!response.ok) throw new Error(`Request failed (${response.status}): ${url}`);
   return (await response.json()) as T;
