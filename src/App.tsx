@@ -2,14 +2,16 @@ import { useEffect, useMemo, useState } from "react";
 import { loadCatalog, type Catalog } from "./catalog";
 
 // Placeholder until the real PayPal URL is set via the VITE_CHECKOUT_URL repository variable.
+// The /it/ path keeps PayPal on the Italian site instead of guessing a region from browser headers.
 const CHECKOUT_URL = import.meta.env.VITE_CHECKOUT_URL?.startsWith("https://")
   ? import.meta.env.VITE_CHECKOUT_URL
-  : "https://www.paypal.com/";
+  : "https://www.paypal.com/it/home";
 
 const FREE_SHIPPING_CENTS = 6000;
 const SHIPPING_CENTS = 600;
 
-const formatMoney = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+const euro = new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" });
+const formatMoney = (cents: number) => euro.format(cents / 100);
 
 function Icon({
   name,
@@ -141,7 +143,7 @@ export default function App() {
 
   const checkout = () => {
     if (!itemCount) {
-      setNotice("Choose at least one item to continue.");
+      setNotice("Scegli almeno un articolo per continuare.");
       return;
     }
     setNotice("");
@@ -151,7 +153,7 @@ export default function App() {
   return (
     <div className="app-shell">
       <header className="site-header">
-        <a className="brand" href="#" aria-label="Catalog home">
+        <a className="brand" href="#" aria-label="Catalog, pagina iniziale">
           <span className="brand-mark">
             <span />
             <span />
@@ -159,15 +161,15 @@ export default function App() {
           </span>
           <span>catalog.</span>
         </a>
-        <nav aria-label="Primary navigation">
+        <nav aria-label="Navigazione principale">
           <a className="nav-link active" href="#shop">
-            Shop
+            Negozio
           </a>
           <a className="nav-link" href="#about">
-            About
+            Informazioni
           </a>
           <a className="nav-link" href="#support">
-            Support
+            Assistenza
           </a>
         </nav>
         <button
@@ -176,25 +178,25 @@ export default function App() {
           onClick={() => document.getElementById("summary")?.scrollIntoView({ behavior: "smooth" })}
         >
           <Icon name="bag" size={19} />
-          <span>Bag</span>
+          <span>Carrello</span>
           <span className="bag-count">{itemCount}</span>
         </button>
       </header>
 
       <main id="shop">
         <section className="intro">
-          <p className="eyebrow">Catalog</p>
-          <h1>Select what you need.</h1>
+          <p className="eyebrow">Catalogo</p>
+          <h1>Scegli ciò di cui hai bisogno.</h1>
           <p className="intro-copy">
-            Browse the items below, choose your quantities, and review your selection before
-            checking out.
+            Sfoglia gli articoli qui sotto, scegli le quantità e controlla la tua selezione prima
+            di procedere al pagamento.
           </p>
           <div className="category-row">
-            <span>Shop all</span>
+            <span>Tutti i prodotti</span>
             <label className="category-select">
-              <span className="sr-only">Filter by category</span>
+              <span className="sr-only">Filtra per categoria</span>
               <select value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
-                <option value="all">All categories</option>
+                <option value="all">Tutte le categorie</option>
                 {(catalog?.categories ?? []).map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -207,15 +209,15 @@ export default function App() {
         </section>
 
         <div className="shop-layout">
-          <section className="product-grid" aria-label="Products" aria-busy={!catalog && !loadError}>
-            {!catalog && !loadError && <p className="grid-message">Loading items…</p>}
+          <section className="product-grid" aria-label="Prodotti" aria-busy={!catalog && !loadError}>
+            {!catalog && !loadError && <p className="grid-message">Caricamento articoli…</p>}
             {loadError && (
               <p className="grid-message" role="alert">
-                Items could not be loaded. Please try again later.
+                Impossibile caricare gli articoli. Riprova più tardi.
               </p>
             )}
             {catalog && visibleProducts.length === 0 && (
-              <p className="grid-message">No items in this category.</p>
+              <p className="grid-message">Nessun articolo in questa categoria.</p>
             )}
             {visibleProducts.map((product) => {
               const quantity = quantities[product.id] || 0;
@@ -228,7 +230,7 @@ export default function App() {
                     {quantity > 0 && (
                       <span className="selected-badge">
                         <Icon name="check" size={14} strokeWidth={2.5} />
-                        Added
+                        Aggiunto
                       </span>
                     )}
                     <ImagePlaceholder src={product.imageUrl} alt={product.name} />
@@ -243,10 +245,10 @@ export default function App() {
                     <p className="price">{formatMoney(product.priceCents)}</p>
                   </div>
                   <div className="quantity-row">
-                    <span>Quantity</span>
-                    <div className="stepper" aria-label={`Quantity for ${product.name}`}>
+                    <span>Quantità</span>
+                    <div className="stepper" aria-label={`Quantità per ${product.name}`}>
                       <button
-                        aria-label={`Decrease ${product.name} quantity`}
+                        aria-label={`Diminuisci la quantità di ${product.name}`}
                         disabled={quantity === 0}
                         onClick={() => updateQuantity(product.id, -1)}
                         type="button"
@@ -255,7 +257,7 @@ export default function App() {
                       </button>
                       <span aria-live="polite">{quantity}</span>
                       <button
-                        aria-label={`Increase ${product.name} quantity`}
+                        aria-label={`Aumenta la quantità di ${product.name}`}
                         onClick={() => updateQuantity(product.id, 1)}
                         type="button"
                       >
@@ -271,11 +273,11 @@ export default function App() {
           <aside className="summary-card" id="summary">
             <div className="summary-heading">
               <div>
-                <p className="eyebrow">Your selection</p>
-                <h2>Order summary</h2>
+                <p className="eyebrow">La tua selezione</p>
+                <h2>Riepilogo ordine</h2>
               </div>
               <span>
-                {itemCount} {itemCount === 1 ? "item" : "items"}
+                {itemCount} {itemCount === 1 ? "articolo" : "articoli"}
               </span>
             </div>
 
@@ -286,7 +288,7 @@ export default function App() {
                     <ImagePlaceholder src={product.imageUrl} alt={product.name} size="thumb" />
                     <div>
                       <h3>{product.name}</h3>
-                      <p>Qty {quantities[product.id]}</p>
+                      <p>Qtà {quantities[product.id]}</p>
                     </div>
                     <strong>{formatMoney(product.priceCents * quantities[product.id])}</strong>
                   </div>
@@ -296,36 +298,39 @@ export default function App() {
                   <span>
                     <Icon name="bag" size={24} />
                   </span>
-                  <p>Your bag is waiting.</p>
-                  <small>Add an item to get started.</small>
+                  <p>Il tuo carrello è vuoto.</p>
+                  <small>Aggiungi un articolo per iniziare.</small>
                 </div>
               )}
             </div>
 
             <div className="totals">
               <div>
-                <span>Subtotal</span>
+                <span>Subtotale</span>
                 <span>{formatMoney(subtotal)}</span>
               </div>
               <div>
-                <span>Shipping</span>
-                <span>{shipping ? formatMoney(shipping) : "Free"}</span>
+                <span>Spedizione</span>
+                <span>{shipping ? formatMoney(shipping) : "Gratuita"}</span>
               </div>
               {subtotal > 0 && subtotal < FREE_SHIPPING_CENTS && (
-                <p>Add {formatMoney(FREE_SHIPPING_CENTS - subtotal)} more for free shipping.</p>
+                <p>
+                  Aggiungi ancora {formatMoney(FREE_SHIPPING_CENTS - subtotal)} per la spedizione
+                  gratuita.
+                </p>
               )}
             </div>
 
             <div className="grand-total">
               <div>
-                <span>Total</span>
-                <small>USD</small>
+                <span>Totale</span>
+                <small>EUR</small>
               </div>
               <strong>{formatMoney(total)}</strong>
             </div>
 
             <button className="paypal-button" type="button" onClick={checkout}>
-              <span>Pay with</span>
+              <span>Paga con</span>
               <strong>
                 <i>Pay</i>Pal
               </strong>
@@ -338,7 +343,7 @@ export default function App() {
             )}
             <p className="secure-note">
               <Icon name="lock" size={14} />
-              Secure checkout powered by PayPal
+              Pagamento sicuro tramite PayPal
             </p>
           </aside>
         </div>
@@ -347,7 +352,7 @@ export default function App() {
       <footer>
         <div className="footer-inner">
           <p>catalog.</p>
-          <span>Free shipping on orders over $60</span>
+          <span>Spedizione gratuita per ordini superiori a {formatMoney(FREE_SHIPPING_CENTS)}</span>
         </div>
       </footer>
     </div>

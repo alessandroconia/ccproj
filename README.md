@@ -24,7 +24,7 @@ All values are read at build time and end up in the public bundle. Only put publ
 | --- | --- | --- |
 | `VITE_SUPABASE_URL` | no | Supabase project URL, `https://<ref>.supabase.co` |
 | `VITE_SUPABASE_ANON_KEY` | no | Supabase anon or publishable key (`sb_publishable_...`) |
-| `VITE_CHECKOUT_URL` | no | Checkout link. Must start with `https://`. Defaults to `https://www.paypal.com/` |
+| `VITE_CHECKOUT_URL` | no | Checkout link. Must start with `https://`. Defaults to `https://www.paypal.com/it/home` |
 
 Without the Supabase values the app loads `public/data/items.json`. It also uses that file if Supabase can't be reached.
 

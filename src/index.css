@@ -13,6 +13,8 @@
   --crimson-dark: #8f0d1d;
   --blush: #f5e6e8;
   --charcoal: #1c1c1c;
+  --paypal: #0070ba;
+  --paypal-dark: #005ea6;
 
   color: var(--ink);
   background: var(--ivory);
@@ -596,7 +598,7 @@ main {
   gap: 8px;
   border-radius: 3px;
   color: #fff;
-  background: var(--crimson);
+  background: var(--paypal);
   cursor: pointer;
   transition:
     background 160ms ease,
@@ -605,7 +607,7 @@ main {
 
 .paypal-button:hover {
   transform: translateY(-1px);
-  background: var(--crimson-dark);
+  background: var(--paypal-dark);
 }
 
 .paypal-button > span {
@@ -620,7 +622,7 @@ main {
 }
 
 .paypal-button strong i {
-  color: var(--blush);
+  color: #cce7f5;
 }
 
 .checkout-notice {
