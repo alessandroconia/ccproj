@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { loadCatalog, type Catalog } from "./catalog";
 
+// Placeholder until the real PayPal URL is set via the VITE_CHECKOUT_URL repository variable.
+const CHECKOUT_URL = import.meta.env.VITE_CHECKOUT_URL?.startsWith("https://")
+  ? import.meta.env.VITE_CHECKOUT_URL
+  : "https://www.paypal.com/";
+
 const FREE_SHIPPING_CENTS = 6000;
 const SHIPPING_CENTS = 600;
 
@@ -140,7 +145,7 @@ export default function App() {
       return;
     }
     setNotice("");
-    window.open("https://www.paypal.com/", "_blank", "noopener,noreferrer");
+    window.open(CHECKOUT_URL, "_blank", "noopener,noreferrer");
   };
 
   return (
